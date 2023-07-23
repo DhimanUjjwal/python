@@ -5,8 +5,8 @@ from rest_framework import status, generics
 from django.shortcuts import render
 from django.http import JsonResponse
 
-from models import Student
-from serializers import StudentSerializer
+from myapi.models import StudentModel
+from myapi.serializers import StudentSerializer
 
 #function-based views (FBV)
 def hello_view(request):
@@ -17,7 +17,7 @@ def hello_view(request):
 #class-based views (CBV)
 class StudentView(generics.GenericAPIView):
     serializerStudentClass = StudentSerializer
-    querySet = Student.object.all
+    querySet = StudentModel.objects.all()
 
 
     def get(self, request):
@@ -28,11 +28,11 @@ class StudentView(generics.GenericAPIView):
         end_num = limit_num * page_num
         search_param = request.GET.get("search")
 
-        student = Student.objects.all()
+        student = StudentModel.objects.all()
         totalStudent = student.count()
 
         if search_param:
-            student = Student.objects.filter(name__icontains=search_param)
+            student = StudentModel.objects.filter(name__icontains=search_param)
         serializer = self.serializerStudentClass(student[start_num, end_num], many=True)
 
         return Response({
@@ -42,7 +42,6 @@ class StudentView(generics.GenericAPIView):
             "last_page": math.ceil(totalStudent/ limit_num),
             "students": serializer.data
         })
-
 
     
     def post(self, request):
